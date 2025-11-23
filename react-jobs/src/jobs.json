@@ -83,6 +83,20 @@
         "contactEmail": "contact@ipsumlorem.com",
         "contactPhone": "555-555-5555"
       }
+    },
+    {
+      "id": "967b",
+      "title": "ise printers",
+      "type": "Full-Time",
+      "location": "Nigeria",
+      "description": "come and print quality work with us",
+      "salary": "Under $50K",
+      "company": {
+        "name": "ise",
+        "description": "we print quality papers ",
+        "contactEmail": "idiaruangela2000@gmail.com",
+        "contactPhone": "0090008009"
+      }
     }
   ]
 }
