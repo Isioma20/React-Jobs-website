@@ -1,26 +1,40 @@
-import React from 'react'
-// import { useState, useEffect } from 'react';
-import { useParams, useLoaderData, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FaArrowLeft, FaMapMarker } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import jobsData from '../data/jobs.json';
 
-const JobPage = ({ deleteJob }) => {
+const JobPage = () => {
   const navigate = useNavigate();
-    const { id } = useParams();
-    const job = useLoaderData();
+  const { id } = useParams();
+  const [job, setJob] = useState(null);
 
-    const onDeleteClick = (jobId) => {
-      const confirm = window.confirm('Are you sure you want to delete this listing?')
+  
 
-      if (!confirm) return;
+  useEffect(() => {
+    const storedJobs = localStorage.getItem('jobs');
+    const jobs = storedJobs ? JSON.parse(storedJobs) : jobsData.jobs;
 
-      deleteJob(jobId);
+    const foundJob = jobs.find((j) => j.id.toString() === id);
+    setJob(foundJob);
+  }, [id]);
 
-      toast.success('Job deleted sucessfully');
+  const onDeleteClick = () => {
+    const confirm = window.confirm('Are you sure you want to delete this listing?');
+    if (!confirm) return;
 
-      navigate('/jobs')
-    };
+    const storedJobs = localStorage.getItem('jobs');
+    const jobs = storedJobs ? JSON.parse(storedJobs) : jobsData.jobs;
+    const updatedJobs = jobs.filter((j) => j.id.toString() !== id);
+    localStorage.setItem('jobs', JSON.stringify(updatedJobs));
+
+    toast.success('Job deleted successfully');
+    navigate('/jobs');
+  };
+
+  if (!job) {
+    return <p className="text-center py-10">Job not found.</p>;
+  }
     // const [job, setJob] = useState(null);
     // const [loading, setLoading] = useState(true);
 
@@ -134,11 +148,4 @@ const JobPage = ({ deleteJob }) => {
   );
 };
 
-const jobLoader = async ({ params }) => {
-    const res = await fetch(`/api/jobs/${params.id}`);
-    const data = await res.json();
-    return data;
-}
-
-
-export { JobPage as default, jobLoader };
+export default JobPage;

@@ -1,48 +1,73 @@
 import React from 'react'
-import { useParams, useLoaderData, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useParams,  useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-const EditJobPage = ({ updateJobSubmit }) => {
-    const job = useLoaderData();
+const EditJobPage = () => {
 
-    const [title, setTitle] = useState(job.title);
-    const [type, setType] = useState(job.type);
-    const [location, setLocation] = useState(job.location);
-    const [description, setDescription] = useState(job.description);
-    const [salary, setSalary] = useState(job.salary);
-    const [companyName, setCompanyName] = useState(job.company.name);
-    const [companyDescription, setCompanyDescription] = useState(job.company.description);
-    const [contactEmail, setContactEmail] = useState(job.company.contactEmail);
-    const [contactPhone, setContactPhone] = useState(job.company.contactPhone);  
-
+   const [title, setTitle] = useState(''); 
+   const [type, setType] = useState('Full-Time'); 
+   const [location, setLocation] = useState(''); 
+   const [description, setDescription] = useState(''); 
+   const [salary, setSalary] = useState('Under $50K'); 
+   const [companyName, setCompanyName] = useState(''); 
+   const [companyDescription, setCompanyDescription] = useState(''); 
+   const [contactEmail, setContactEmail] = useState(''); 
+   const [contactPhone, setContactPhone] = useState('');
+    
     const navigate = useNavigate();
     const { id } = useParams();
-    
-    const submitForm = (e) => {
-                e.preventDefault();
-        
-                const updatedJob = {
-                    id,
-                    title,
-                    type,
-                    location,
-                    description,
-                    salary,
-                    company: {
-                        name: companyName,
-                        description: companyDescription,
-                        contactEmail,
-                        contactPhone
-                    },
-                };
-        
-                updateJobSubmit(updatedJob);
-        
-                toast.success('Job updated sucessfully')
-        
-                return navigate(`/jobs/${id}`);
-    };
+    const [job, setJob] = useState(null);
+
+    useEffect(() => {
+    const storedJobs = JSON.parse(localStorage.getItem('jobs')) || [];
+    const existingJob = storedJobs.find(job => job.id == id); // loose equality to handle string vs number
+
+    if (existingJob) {
+        setTitle(existingJob.title);
+        setType(existingJob.type);
+        setLocation(existingJob.location);
+        setDescription(existingJob.description);
+        setSalary(existingJob.salary);
+        setCompanyName(existingJob.company.name);
+        setCompanyDescription(existingJob.company.description);
+        setContactEmail(existingJob.company.contactEmail);
+        setContactPhone(existingJob.company.contactPhone);
+    } else {
+        toast.error('Job not found!');
+        navigate('/jobs');
+    }
+}, [id, navigate]);
+
+const submitForm = (e) => {
+    e.preventDefault();
+
+    const storedJobs = JSON.parse(localStorage.getItem('jobs')) || [];
+
+    const updatedJobs = storedJobs.map(job =>
+        job.id == id
+            ? {
+                  ...job,
+                  title,
+                  type,
+                  location,
+                  description,
+                  salary,
+                  company: {
+                      name: companyName,
+                      description: companyDescription,
+                      contactEmail,
+                      contactPhone,
+                  },
+              }
+            : job
+    );
+
+    localStorage.setItem('jobs', JSON.stringify(updatedJobs));
+    toast.success('Job updated successfully!');
+    navigate(`/jobs/${id}`);
+};
+
 
   return (
     <section className="bg-indigo-50">

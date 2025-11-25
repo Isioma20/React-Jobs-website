@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const AddJobPage = ({ addJobSubmit }) => {
+const AddJobPage = () => {
     const [title, setTitle] = useState('');
     const [type, setType] = useState('Full-Time');
     const [location, setLocation] = useState('');
@@ -19,7 +19,10 @@ const AddJobPage = ({ addJobSubmit }) => {
     const submitForm = (e) => {
         e.preventDefault();
 
+        const storedJobs = JSON.parse(localStorage.getItem('jobs')) || [];
+
         const newJob = {
+            id: storedJobs.length > 0 ? storedJobs[storedJobs.length - 1].id + 1 : 1,
             title,
             type,
             location,
@@ -33,7 +36,8 @@ const AddJobPage = ({ addJobSubmit }) => {
             },
         };
 
-        addJobSubmit(newJob);
+        const updatedJobs = [...storedJobs, newJob]; 
+        localStorage.setItem('jobs', JSON.stringify(updatedJobs));
 
         toast.success('Job added sucessfully')
 
